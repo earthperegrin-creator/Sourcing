@@ -9,6 +9,21 @@ export interface BoardMetric {
 }
 
 const WITHHELD = new Set(["", "暫不提供", "null", "n/a", "N/A", "-"]);
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function formatAppeared(token: string): string {
+  const [monthRaw, dayRaw] = token.split("/");
+  const month = MONTHS[Number(monthRaw) - 1];
+  const day = Number(dayRaw);
+  if (!month || !Number.isInteger(day) || day < 1 || day > 31) return token;
+  return `${month} ${day}`;
+}
+
+function tractionApprox(company: Company): string | null {
+  const part = partsOf(company.traction).find((item) => /^104 headcount\b/i.test(item));
+  const match = part?.match(/~\s*(\d+)/);
+  return match ? match[1] : null;
+}
 
 function withheld(value: string | null | undefined): boolean {
   if (value == null) return true;
@@ -42,7 +57,8 @@ export function jobBoardMetrics(company: Company): BoardMetric[] {
   const hiringRaw = company.hiring_activity_104?.trim() ?? "";
   const appeared = hiringRaw.match(/recent_job_appear=(\d{1,2}\/\d{1,2})/);
   const hiringKnown = hiringRaw.length > 0 && !WITHHELD.has(hiringRaw);
-  const hiringValue = appeared ? appeared[1] : hiringKnown ? hiringRaw : "Unknown";
+  const hiringValue = appeared ? formatAppeared(appeared[1]) : hiringKnown ? hiringRaw : "Unknown";
+  const approx = !headcountKnown ? tractionApprox(company) : null;
 
   return [
     {
@@ -50,7 +66,7 @@ export function jobBoardMetrics(company: Company): BoardMetric[] {
       label: "Headcount",
       value: headcountValue,
       known: headcountKnown,
-      hint: headcountKnown ? "people" : "not disclosed",
+      hint: headcountKnown ? "people" : approx ? `~${approx} noted` : "not disclosed",
     },
     {
       id: "jobs",
@@ -64,7 +80,7 @@ export function jobBoardMetrics(company: Company): BoardMetric[] {
       label: "Hiring",
       value: hiringValue,
       known: hiringKnown,
-      hint: hiringKnown ? (appeared ? "appeared" : "104") : "not disclosed",
+      hint: hiringKnown ? (appeared ? "latest post" : "104") : "not disclosed",
     },
   ];
 }
