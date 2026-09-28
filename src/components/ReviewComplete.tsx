@@ -26,22 +26,19 @@ export function ReviewComplete({ votes, digs, onRestart }: ReviewCompleteProps) 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: listEase }}
     >
-      <h2 className="text-[34px] font-bold leading-none tracking-[-0.04em] text-pearl">Done</h2>
+      <span aria-hidden="true" className="mt-6 h-px w-12 self-center bg-ice/70" style={{ boxShadow: "0 0 12px rgba(85,233,255,0.5)" }} />
+      <h2 className="mt-6 text-center text-[30px] font-light leading-none tracking-[-0.04em] text-pearl">Queue is clear</h2>
 
-      <div className="mt-7 grid grid-cols-3 gap-2">
+      <dl className="mt-8 grid w-full grid-cols-3 overflow-hidden rounded-[22px] bg-midnight-raised ring-1 ring-white/[0.07]">
         {voteOrder.map(({ key, label }, index) => (
-          <motion.div
-            key={key}
-            className="rounded-[20px] bg-midnight-raised px-3 py-4 ring-1 ring-white/[0.06]"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.04 + index * 0.04, ease: listEase }}
-          >
-            <div className="text-[32px] font-semibold leading-none tracking-[-0.04em] text-pearl">{votes[key].length}</div>
-            <div className="mt-2 text-[12px] font-medium text-pearl/45">{label}</div>
-          </motion.div>
+          <div key={key} className={`flex flex-col-reverse items-center py-5 ${index > 0 ? "border-l border-white/[0.06]" : ""}`}>
+            <dt className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">{label}</dt>
+            <dd className={`text-[30px] font-light leading-none tracking-[-0.04em] tabular-nums ${key === "yes" ? "text-ice" : "text-pearl"}`}>
+              {votes[key].length}
+            </dd>
+          </div>
         ))}
-      </div>
+      </dl>
 
       <motion.div
         className="mt-3 rounded-[20px] bg-ice/[0.06] px-4 py-3.5 ring-1 ring-ice/25"

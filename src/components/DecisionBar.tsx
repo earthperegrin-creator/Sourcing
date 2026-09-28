@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Check, Minus, Search, X } from "lucide-react";
 import type { Vote } from "../types/company";
 
 interface DecisionBarProps {
@@ -7,10 +8,10 @@ interface DecisionBarProps {
   disabled?: boolean;
 }
 
-const votes: { value: Vote; label: string; key: string }[] = [
-  { value: "no", label: "No", key: "ArrowLeft" },
-  { value: "maybe", label: "Maybe", key: "ArrowDown" },
-  { value: "yes", label: "Yes", key: "ArrowRight" },
+const votes: { value: Vote; label: string; key: string; icon: typeof X }[] = [
+  { value: "no", label: "No", key: "ArrowLeft", icon: X },
+  { value: "maybe", label: "Maybe", key: "ArrowDown", icon: Minus },
+  { value: "yes", label: "Yes", key: "ArrowRight", icon: Check },
 ];
 
 export function DecisionBar({ onVote, onDig, disabled = false }: DecisionBarProps) {
@@ -37,26 +38,31 @@ export function DecisionBar({ onVote, onDig, disabled = false }: DecisionBarProp
   }, [disabled, onDig, onVote]);
 
   return (
-    <div className="relative z-10 bg-midnight px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3">
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={onDig}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-[16px] text-pearl/75 ring-1 ring-white/[0.1] transition-colors hover:bg-white/[0.03] hover:text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/40 disabled:opacity-40"
-      >
-        <span className="text-[14px] font-semibold tracking-[-0.01em] text-pearl/90">Dig</span>
-        <span className="text-[13px] text-pearl/40">Need more info</span>
-      </button>
+    <div className="relative z-20 px-4 pb-[max(1.35rem,env(safe-area-inset-bottom))] pt-3 sm:pb-8">
+      <div className="mb-3 flex items-center justify-between px-1">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={onDig}
+          aria-pressed="false"
+          className="flex h-8 items-center gap-1.5 rounded-full bg-white/[0.03] px-3 text-[12.5px] font-medium tracking-[-0.005em] text-pearl/70 ring-1 ring-white/[0.1] transition-colors hover:text-pearl hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50 disabled:opacity-40"
+        >
+          <Search className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+          Dig
+        </button>
+        <span className="text-[12px] tracking-[-0.005em] text-pearl/35">Need more info</span>
+      </div>
 
-      <div role="group" aria-label="Review vote" className="mt-3 grid grid-cols-3 gap-2">
-        {votes.map(({ value, label }) => (
+      <div role="group" aria-label="Your call" className="grid grid-cols-3 gap-2">
+        {votes.map(({ value, label, icon: Icon }) => (
           <button
             key={value}
             type="button"
             disabled={disabled}
             onClick={() => onVote(value)}
-            className="h-14 rounded-[16px] bg-white/[0.09] text-[16px] font-semibold tracking-[-0.015em] text-pearl transition-[transform,background-color] hover:bg-white/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50 active:scale-[0.98] disabled:opacity-40"
+            className="flex h-[58px] items-center justify-center gap-2 rounded-[18px] border border-white/[0.09] bg-midnight-raised text-[15px] font-medium tracking-[-0.015em] text-pearl shadow-[inset_0_1px_0_rgba(243,244,238,0.06)] transition-colors hover:border-ice/40 focus-visible:border-ice/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/25 active:scale-[0.98] active:border-ice/70 active:text-ice disabled:opacity-40"
           >
+            <Icon className="h-[17px] w-[17px] opacity-60" strokeWidth={1.8} aria-hidden="true" />
             {label}
           </button>
         ))}

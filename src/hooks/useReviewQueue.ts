@@ -57,8 +57,11 @@ export function useReviewQueue(items: Company[]) {
     [history, byId],
   );
 
+  const next = currentIndex >= 0 ? items[currentIndex + 1] ?? null : null;
+
   return {
     current,
+    next,
     currentIndex,
     reviewedCount: history.length,
     canUndo: history.length > 0,

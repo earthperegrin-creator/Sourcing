@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { AuroraBackdrop } from "./AuroraBackdrop";
 
 interface TitleBeatProps {
   onDone: () => void;
@@ -24,9 +25,11 @@ export function TitleBeat({ onDone }: TitleBeatProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
     >
-      <div className="relative flex flex-col items-center">
+      <AuroraBackdrop variant="title" />
+      <div className="relative -mt-10 flex flex-col items-center">
         <motion.h1
-          className="text-[44px] font-medium leading-none tracking-[-0.045em] text-pearl"
+          className="text-[48px] font-light leading-none tracking-[-0.045em] text-pearl"
+          style={{ textShadow: "0 0 1px rgba(85,233,255,0.5), 0 0 32px rgba(85,233,255,0.2)" }}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
