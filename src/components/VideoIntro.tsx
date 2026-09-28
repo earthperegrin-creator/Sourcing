@@ -89,7 +89,13 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
           const video = event.currentTarget;
           if (!Number.isFinite(video.duration) || video.duration === 0) return;
           setProgress(video.currentTime / video.duration);
-          if (video.duration - video.currentTime < 0.9) beginDim();
+          if (
+            video.duration > 4 &&
+            video.currentTime > 2 &&
+            video.duration - video.currentTime < 0.9
+          ) {
+            beginDim();
+          }
         }}
       />
 
@@ -122,7 +128,7 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
         <button
           type="button"
           onClick={beginDim}
-          className="font-mono text-[11px] uppercase tracking-[0.22em] text-pearl/80 transition-colors hover:text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
+          className="rounded-full border border-white/30 bg-midnight-deep/55 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-pearl backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-midnight-deep/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
         >
           Skip
         </button>
