@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --color-midnight: #0a1028;
+  --color-midnight-deep: #060a1c;
+  --color-midnight-raised: #111937;
+  --color-pearl: #f3f4ee;
+  --color-ice: #55e9ff;
+  --color-aurora: #afa7ff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #060a1c;
+  color: #f3f4ee;
+  font-family: var(--font-sans);
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(85, 233, 255, 0.22);
+  color: #f3f4ee;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
