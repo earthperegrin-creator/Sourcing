@@ -5,6 +5,7 @@ interface VideoIntroProps {
   onDone: () => void;
 }
 
+const VIDEO_SRC = "/intro/arctic-garden-stroll.mp4";
 const DIM_MS = 1100;
 
 export function VideoIntro({ onDone }: VideoIntroProps) {
@@ -25,16 +26,35 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    let cancelled = false;
-    const attempt = video.play();
-    if (attempt) {
-      attempt.catch(() => {
-        if (!cancelled) setBlocked(true);
-      });
-    }
+    let alive = true;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "true");
+
+    const start = () => {
+      if (!alive || dimmingRef.current) return;
+      const pending = video.play();
+      if (!pending) return;
+      pending
+        .then(() => {
+          if (alive) setBlocked(false);
+        })
+        .catch(() => {
+          if (alive) setBlocked(true);
+        });
+    };
+
+    start();
+    video.addEventListener("loadeddata", start);
+    video.addEventListener("canplay", start);
+
     return () => {
-      cancelled = true;
-      video.pause();
+      alive = false;
+      video.removeEventListener("loadeddata", start);
+      video.removeEventListener("canplay", start);
       if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     };
   }, []);
@@ -42,6 +62,7 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
   function playFromTap() {
     const video = videoRef.current;
     if (!video) return;
+    video.muted = true;
     setBlocked(false);
     void video.play().catch(() => setBlocked(true));
   }
@@ -57,19 +78,18 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
       <video
         ref={videoRef}
         className="absolute inset-0 h-full w-full object-cover"
-        src="/intro/arctic-garden-stroll.mp4"
-        poster="/intro/poster.jpg"
+        src={VIDEO_SRC}
         autoPlay
         muted
         playsInline
         preload="auto"
+        disablePictureInPicture
         onEnded={beginDim}
-        onError={beginDim}
         onTimeUpdate={(event) => {
           const video = event.currentTarget;
-          if (!video.duration) return;
+          if (!Number.isFinite(video.duration) || video.duration === 0) return;
           setProgress(video.currentTime / video.duration);
-          if (video.duration - video.currentTime < 0.85) beginDim();
+          if (video.duration - video.currentTime < 0.9) beginDim();
         }}
       />
 
@@ -83,15 +103,12 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-midnight-deep/80 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-midnight-deep/70 to-transparent"
       />
 
       <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        <div className="mb-4 h-px w-full overflow-hidden bg-white/10">
-          <div
-            className="h-px bg-ice/80 shadow-[0_0_12px_rgba(85,233,255,0.65)] transition-[width] duration-200"
-            style={{ width: `${Math.min(100, progress * 100)}%` }}
-          />
+        <div className="mb-4 h-px w-full overflow-hidden bg-white/15">
+          <div className="h-px bg-ice/80" style={{ width: `${Math.min(100, progress * 100)}%` }} />
         </div>
         {blocked ? (
           <button
@@ -105,7 +122,7 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
         <button
           type="button"
           onClick={beginDim}
-          className="font-mono text-[11px] uppercase tracking-[0.22em] text-pearl/70 transition-colors hover:text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
+          className="font-mono text-[11px] uppercase tracking-[0.22em] text-pearl/80 transition-colors hover:text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
         >
           Skip
         </button>

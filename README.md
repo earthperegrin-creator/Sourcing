@@ -13,7 +13,7 @@ Open the URL Vite prints (usually http://localhost:5173). On a wide screen the U
 
 ## Flow
 
-1. **Garden stroll.** `public/intro/arctic-garden-stroll.mp4` plays full-bleed in the phone. Near the end the frame darkens. Skip is at the bottom if you do not want to wait.
+1. **Garden stroll.** `public/intro/arctic-garden-stroll.mp4` autoplays muted and full-bleed inside the phone (`playsInline` on mobile). It is the opening footage, not a still. Near the end the frame fades to black. Skip is at the bottom.
 2. **Title.** A dark screen with the word **sourcing**. It holds, then continues. Tap to go on.
 3. **Review.** One company card at a time, seeded from `src/data/companies.json`.
 
