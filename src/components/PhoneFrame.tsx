@@ -4,7 +4,7 @@ import { GrainOverlay } from "./GrainOverlay";
 export function PhoneFrame({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh w-full items-center justify-center bg-[#04060F] sm:py-8">
-      <div className="sm:rounded-[54px] sm:bg-[#0B0E1A] sm:p-[10px] sm:shadow-[0_50px_140px_rgba(0,0,0,0.7)] sm:ring-1 sm:ring-white/[0.09]">
+      <div className="w-full sm:w-auto sm:rounded-[54px] sm:bg-[#0B0E1A] sm:p-[10px] sm:shadow-[0_50px_140px_rgba(0,0,0,0.7)] sm:ring-1 sm:ring-white/[0.09]">
         <div className="relative h-dvh w-full overflow-hidden bg-midnight sm:aspect-[9/16] sm:h-[min(844px,calc(100dvh-64px))] sm:w-auto sm:rounded-[44px]">
           <div
             aria-hidden="true"

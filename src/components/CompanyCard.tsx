@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { splitLean, splitTraction } from "../lib/copy";
 import { countryLabel } from "../lib/countries";
 import type { Company } from "../types/company";
 
@@ -9,20 +9,39 @@ interface CompanyCardProps {
 }
 
 function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? "")
-    .join("");
+  const words = name.split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (words.length === 0) return name.slice(0, 2).toUpperCase();
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
+}
+
+function tractionParts(traction: string): string[] {
+  return traction
+    .split(/\s*;\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function leanTone(lean: string): string {
+  const value = lean.trim();
+  if (value === "Yes" || value.startsWith("Yes ") || value.startsWith("Yes—") || value.startsWith("Yes-")) {
+    return "bg-ice/[0.08] text-ice ring-ice/35";
+  }
+  if (value === "Maybe" || value.startsWith("Maybe ") || value.startsWith("Maybe—") || value.startsWith("Maybe-")) {
+    return "bg-white/[0.05] text-pearl ring-white/15";
+  }
+  return "bg-white/[0.04] text-pearl/75 ring-white/10";
 }
 
 export function CompanyCard({ company, muted = false }: CompanyCardProps) {
-  const traction = splitTraction(company.traction);
-  const lean = splitLean(company.rubric_lean);
-  const metricSize = traction.lead.length > 28 ? "text-[22px]" : "text-[30px]";
+  const [open, setOpen] = useState(false);
+  const parts = tractionParts(company.traction);
+  const lead = parts[0] ?? company.traction;
+  const rest = parts.slice(1);
+  const metricSize = lead.length > 28 ? "text-[22px]" : "text-[30px]";
+  const country = countryLabel(company.country);
   const links = [
-    { href: company.website_url, label: "Website" },
+    ...(company.website_url ? [{ href: company.website_url, label: "Website" }] : []),
     ...(company.linkedin_url ? [{ href: company.linkedin_url, label: "LinkedIn" }] : []),
   ];
 
@@ -41,63 +60,111 @@ export function CompanyCard({ company, muted = false }: CompanyCardProps) {
           {initials(company.name)}
         </div>
 
-        <h2 className="mt-5 text-[32px] font-semibold leading-none tracking-[-0.04em] text-pearl">{company.name}</h2>
+        <h2 className="mt-5 text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-pearl">{company.name}</h2>
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 text-[12px] font-medium text-pearl/80 ring-1 ring-white/[0.1]">
-            <span className="font-mono text-[10px] text-pearl/45">{company.country}</span>
-            {countryLabel(company.country)}
+          <span className="inline-flex h-6 items-center rounded-full bg-white/[0.04] px-2.5 text-[12px] font-medium text-pearl/80 ring-1 ring-white/[0.1]">
+            {country === company.country ? country : `${company.country} ${country}`}
           </span>
           {company.stage ? (
             <span className="inline-flex h-6 items-center rounded-full bg-ice/[0.06] px-2.5 text-[12px] font-medium text-ice ring-1 ring-ice/30">
               {company.stage}
             </span>
           ) : null}
+          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium leading-snug ring-1 ${leanTone(company.rubric_lean)}`}>
+            {company.rubric_lean}
+          </span>
         </div>
 
-        <p className="mt-5 text-[15px] leading-[1.55] tracking-[-0.01em] text-pearl/70">{company.summary}</p>
-
-        <div className="mt-6 border-t border-white/[0.07] pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Traction</p>
-          <p className={`mt-2 font-medium leading-[1.05] tracking-[-0.035em] text-pearl ${metricSize}`}>
-            {traction.lead}
+        <section className="mt-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Summary</p>
+          <p className={`mt-2 text-[15px] leading-[1.55] tracking-[-0.01em] text-pearl/75 ${open ? "" : "line-clamp-3"}`}>
+            {company.summary}
           </p>
-          {traction.support ? <p className="mt-2 text-[13px] leading-snug text-pearl/50">{traction.support}</p> : null}
-        </div>
+        </section>
 
-        <dl className="mt-4">
-          {company.fundraising && company.fundraising !== company.stage ? (
-            <Fact label="Fundraising" value={company.fundraising} />
+        <section className="mt-5 border-t border-white/[0.07] pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Traction</p>
+          <p className={`mt-2 font-medium leading-[1.05] tracking-[-0.035em] text-pearl ${metricSize}`}>{lead}</p>
+          {rest.length > 0 ? (
+            <ul className={`mt-2 space-y-1 ${open ? "" : "line-clamp-2"}`}>
+              {(open ? rest : rest.slice(0, 2)).map((part) => (
+                <li key={part} className="text-[13px] leading-snug text-pearl/50">
+                  {part}
+                </li>
+              ))}
+            </ul>
           ) : null}
-          {lean.stance ? <Fact label="Lean" value={lean.stance} /> : null}
-          {company.team ? <Fact label="Team" value={company.team} /> : null}
-        </dl>
-        {lean.note ? <p className="mt-1 text-[13px] leading-snug text-pearl/45">{lean.note}</p> : null}
+        </section>
 
-        <div className="mt-4 overflow-hidden rounded-[18px] bg-black/20 ring-1 ring-white/[0.06]">
-          {links.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between gap-3 border-t border-white/[0.06] px-4 py-3.5 text-[14px] font-medium text-pearl first:border-t-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
-            >
-              {link.label}
-              <ChevronRight className="h-4 w-4 text-pearl/35" strokeWidth={1.8} aria-hidden="true" />
-            </a>
-          ))}
-        </div>
+        {company.fundraising ? (
+          <section className="mt-5 border-t border-white/[0.07] pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Fundraising</p>
+            <p className={`mt-2 text-[14px] leading-snug text-pearl/75 ${open ? "" : "line-clamp-3"}`}>{company.fundraising}</p>
+          </section>
+        ) : null}
+
+        {company.team ? (
+          <section className="mt-5 border-t border-white/[0.07] pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Team</p>
+            <p className={`mt-2 text-[14px] leading-snug text-pearl/75 ${open ? "" : "line-clamp-3"}`}>{company.team}</p>
+          </section>
+        ) : null}
+
+        <section className="mt-5 border-t border-white/[0.07] pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Why interesting</p>
+          <p className={`mt-2 text-[14px] leading-snug tracking-[-0.01em] text-pearl/75 ${open ? "" : "line-clamp-3"}`}>
+            {company.why_interesting}
+          </p>
+        </section>
+
+        {company.decision_hooks.length > 0 ? (
+          <section className="mt-5 border-t border-white/[0.07] pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Decision hooks</p>
+            <ul className="mt-2 space-y-2">
+              {company.decision_hooks.map((hook) => (
+                <li key={hook} className="flex gap-2.5 text-[13.5px] leading-snug text-pearl/75">
+                  <span aria-hidden="true" className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-ice/80" />
+                  <span className={open ? "" : "line-clamp-2"}>{hook}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {open && company.sector ? (
+          <section className="mt-5 border-t border-white/[0.07] pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Sector</p>
+            <p className="mt-2 text-[13px] leading-snug text-pearl/55">{company.sector}</p>
+          </section>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          className="mt-4 text-[13px] font-medium text-ice/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
+        >
+          {open ? "Hide details" : "Details"}
+        </button>
+
+        {links.length > 0 ? (
+          <div className="mt-4 overflow-hidden rounded-[18px] bg-black/20 ring-1 ring-white/[0.06]">
+            {links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between gap-3 border-t border-white/[0.06] px-4 py-3.5 text-[14px] font-medium text-pearl first:border-t-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
+              >
+                {link.label}
+                <ChevronRight className="h-4 w-4 text-pearl/35" strokeWidth={1.8} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        ) : null}
       </div>
     </article>
-  );
-}
-
-function Fact({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 border-t border-white/[0.07] py-3 first:border-t-0">
-      <dt className="text-[13px] text-pearl/45">{label}</dt>
-      <dd className="text-right text-[14px] font-medium tracking-[-0.01em] text-pearl">{value}</dd>
-    </div>
   );
 }

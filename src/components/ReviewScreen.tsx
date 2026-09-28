@@ -80,7 +80,11 @@ export function ReviewScreen() {
             </span>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-5 gap-1" aria-hidden="true">
+        <div
+          className="mt-4 grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}
+          aria-hidden="true"
+        >
           {companies.map((company, index) => {
             const decided = index < queue.reviewedCount;
             const isCurrent = queue.current?.id === company.id;

@@ -17,15 +17,9 @@ Open the URL Vite prints (usually http://localhost:5173). On a wide screen the U
 2. **Title.** A dark screen with the word **sourcing**. It holds, then continues. Tap to go on.
 3. **Review.** One company card at a time, seeded from `src/data/companies.json`.
 
-The five companies, in order:
+The twenty Taiwan companies, in file order: Skymizer, Gallopwave, ioNetworks, AIWin, KeyXentic, Ubiik, FlowVIEW Tek, Wolley, LIPS, Hihealth, Calyxtechs, ECOLUX, Huede Healthtech, RelaJet / Otoadd, EMCT, BigGo, PYRAS TECHNOLOGY, Develop, Aiii, DWTEK.
 
-- Tokuiten
-- HistoSonics
-- EF Polymer
-- Green Chem
-- PandaDoc
-
-Cards use the fields from that file. Traction is shown as a bold lead, with the rest of that field underneath. Country, stage, summary, fundraising, rubric lean, website, and LinkedIn appear when those values exist.
+Cards use the fields from that file. Summary, traction, why interesting, and decision-hook bullets are on the card. Long text opens with Details. Fundraising and team appear when those values exist. Rubric lean is the badge on the card.
 
 ## Actions
 
