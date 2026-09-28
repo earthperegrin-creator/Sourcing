@@ -1,0 +1,72 @@
+[
+  {
+    "id": "4d2ea169-33ce-47ab-92f5-9a75314a4114",
+    "slug": "tokuiten",
+    "name": "Tokuiten",
+    "country": "JP",
+    "stage": "Series A",
+    "website_url": "https://tokuiten.jp/",
+    "linkedin_url": null,
+    "summary": "Vertically integrated organic farming (branded mini tomatoes for retail) plus an in-house modular farm robot (Titan) and cultivation know-how, licensed to corporates entering agriculture via Area Owner → Partner Farm.",
+    "traction": "Operating farms + robot packaging; corporate licensing program live.",
+    "fundraising": "Series A",
+    "team": null,
+    "rubric_lean": "Maybe — real ops + hardware; diligence on unit economics and license attach."
+  },
+  {
+    "id": "d16c3e54-5fba-4213-b775-106b85bd9425",
+    "slug": "histosonics",
+    "name": "HistoSonics",
+    "country": "US",
+    "stage": "Growth",
+    "website_url": "https://histosonics.com/",
+    "linkedin_url": null,
+    "summary": "Edison histotripsy system: FDA-cleared focused ultrasound that mechanically destroys tumors non-invasively for oncology patients.",
+    "traction": "FDA-cleared platform in market.",
+    "fundraising": "Growth-stage (late)",
+    "team": null,
+    "rubric_lean": "No for personal angel — growth medical device, check size likely out of range."
+  },
+  {
+    "id": "85c993cd-ff93-48dc-84aa-f4b0d19bf6c8",
+    "slug": "ef-polymer",
+    "name": "EF Polymer",
+    "country": "JP",
+    "stage": "Series A",
+    "website_url": "https://ja.efpolymer.com/",
+    "linkedin_url": "https://www.linkedin.com/company/ef-polymer-global",
+    "summary": "Plant-based superabsorbent polymer made from orange peels — water-retention material for agriculture and related uses.",
+    "traction": "Commercial product; Japan-rooted with global LinkedIn presence.",
+    "fundraising": "Series A",
+    "team": null,
+    "rubric_lean": "Maybe — clear product; dig materials margins and customer proof."
+  },
+  {
+    "id": "12085ad8-2c70-4ca6-a926-d9d646567ae4",
+    "slug": "green-chem",
+    "name": "Green Chem",
+    "country": "JP",
+    "stage": null,
+    "website_url": "https://green-chem.jp",
+    "linkedin_url": null,
+    "summary": "Chemical and nanotechnology materials company developing industrial and pharmaceutical innovations.",
+    "traction": "Thin public detail on traction.",
+    "fundraising": null,
+    "team": null,
+    "rubric_lean": "Dig — need concrete product/customer before scoring."
+  },
+  {
+    "id": "270a13bf-3fd9-4e7d-aabb-322626c65a9b",
+    "slug": "pandadoc",
+    "name": "PandaDoc",
+    "country": "US",
+    "stage": "Series B",
+    "website_url": "http://www.pandadoc.com/",
+    "linkedin_url": null,
+    "summary": "Document creation, e-signature, and workflow automation platform for sales and ops teams.",
+    "traction": "Widely known SaaS category leader.",
+    "fundraising": "Series B+",
+    "team": null,
+    "rubric_lean": "No for personal angel — mature US SaaS; not early personal check."
+  }
+]
