@@ -17,4 +17,9 @@ export interface Company {
   why_interesting: string;
   decision_hooks: string[];
   sources_note: string | null;
+  headcount_104: string | null;
+  headcount_104_num: number | null;
+  open_jobs_104: string | null;
+  open_jobs_104_num: number | null;
+  hiring_activity_104: string | null;
 }
