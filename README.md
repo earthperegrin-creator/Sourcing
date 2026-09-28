@@ -19,7 +19,7 @@ Open the URL Vite prints (usually http://localhost:5173). On a wide screen the U
 
 The twenty Taiwan companies, in file order: Skymizer, Gallopwave, ioNetworks, AIWin, KeyXentic, Ubiik, FlowVIEW Tek, Wolley, LIPS, Hihealth, Calyxtechs, ECOLUX, Huede Healthtech, RelaJet / Otoadd, EMCT, BigGo, PYRAS TECHNOLOGY, Develop, Aiii, DWTEK.
 
-Cards use the fields from that file. Summary, traction, why interesting, and decision-hook bullets are on the card. Long text opens with Details. Fundraising and team appear when those values exist. Rubric lean is the badge on the card.
+Cards use that file, including the structured 104 fields. Headcount, open jobs, and hiring activity sit in a 104.com metric row under the name. Unknown headcount stays unknown. Summary, signals, fundraising, team, why interesting, and decision hooks are short bullets. Fundraising and team say when the record does not have them. Details opens the original summary, the raw traction line, and sources. Rubric lean is the badge on the card.
 
 ## Actions
 

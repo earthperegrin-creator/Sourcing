@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
+import { briefFor } from "../data/briefs";
 import { countryLabel } from "../lib/countries";
+import { jobBoardMetrics, signalBullets, type BoardMetric } from "../lib/cardFacts";
 import type { Company } from "../types/company";
 
 interface CompanyCardProps {
@@ -15,13 +17,6 @@ function initials(name: string): string {
   return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
 }
 
-function tractionParts(traction: string): string[] {
-  return traction
-    .split(/\s*;\s*/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-}
-
 function leanTone(lean: string): string {
   const value = lean.trim();
   if (value === "Yes" || value.startsWith("Yes ") || value.startsWith("Yes—") || value.startsWith("Yes-")) {
@@ -33,17 +28,69 @@ function leanTone(lean: string): string {
   return "bg-white/[0.04] text-pearl/75 ring-white/10";
 }
 
+function BulletList({ items, className }: { items: string[]; className: string }) {
+  return (
+    <ul className="mt-2.5 space-y-2">
+      {items.map((item, index) => {
+        const quiet = item.startsWith("Not disclosed") || item.startsWith("No founder");
+        return (
+          <li key={`${index}-${item.slice(0, 24)}`} className={`flex gap-2.5 ${className} ${quiet ? "text-pearl/45" : "text-pearl/80"}`}>
+            <span aria-hidden="true" className={`mt-[0.55em] h-1 w-1 shrink-0 rounded-full ${quiet ? "bg-pearl/25" : "bg-ice/80"}`} />
+            <span className="min-w-0 break-words">{item}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function MetricCell({ metric }: { metric: BoardMetric }) {
+  return (
+    <div
+      className={`flex min-h-[96px] min-w-0 flex-col justify-between rounded-[16px] border px-2.5 py-3 ${
+        metric.known
+          ? "border-ice/35 bg-ice/[0.08] shadow-[inset_0_1px_0_rgba(85,233,255,0.22)]"
+          : "border-dashed border-white/20 bg-white/[0.03]"
+      }`}
+      aria-label={`${metric.label} ${metric.value}, ${metric.hint}, 104.com`}
+    >
+      <p className={`font-mono text-[10px] uppercase tracking-[0.12em] ${metric.known ? "text-ice/80" : "text-pearl/40"}`}>
+        {metric.label}
+      </p>
+      <p
+        className={`mt-1.5 tracking-[-0.04em] ${
+          metric.known
+            ? "text-[28px] font-semibold leading-none text-pearl tabular-nums"
+            : "text-[17px] font-medium leading-tight text-pearl/45"
+        }`}
+      >
+        {metric.value}
+      </p>
+      <p className="mt-1.5 text-[11px] leading-none text-pearl/40">{metric.hint}</p>
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">{children}</p>;
+}
+
 export function CompanyCard({ company, muted = false }: CompanyCardProps) {
   const [open, setOpen] = useState(false);
-  const parts = tractionParts(company.traction);
-  const lead = parts[0] ?? company.traction;
-  const rest = parts.slice(1);
-  const metricSize = lead.length > 28 ? "text-[22px]" : "text-[30px]";
   const country = countryLabel(company.country);
+  const brief = briefFor(company.slug);
+  const metrics = jobBoardMetrics(company);
+  const signals = signalBullets(company);
   const links = [
     ...(company.website_url ? [{ href: company.website_url, label: "Website" }] : []),
     ...(company.linkedin_url ? [{ href: company.linkedin_url, label: "LinkedIn" }] : []),
   ];
+
+  const summary = brief?.summary ?? [company.summary];
+  const why = brief?.why ?? [company.why_interesting];
+  const hooks = brief?.hooks ?? company.decision_hooks;
+  const fundraising = brief?.fundraising ?? (company.fundraising ? [company.fundraising] : ["Not disclosed in this record."]);
+  const team = brief?.team ?? (company.team ? [company.team] : ["Not disclosed in this record."]);
 
   return (
     <article
@@ -76,67 +123,64 @@ export function CompanyCard({ company, muted = false }: CompanyCardProps) {
           </span>
         </div>
 
+        <section className="mt-5" aria-label="104.com job board">
+          <SectionLabel>104.com</SectionLabel>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {metrics.map((metric) => (
+              <MetricCell key={metric.id} metric={metric} />
+            ))}
+          </div>
+        </section>
+
         <section className="mt-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Summary</p>
-          <p className={`mt-2 text-[15px] leading-[1.55] tracking-[-0.01em] text-pearl/75 ${open ? "" : "line-clamp-3"}`}>
-            {company.summary}
-          </p>
+          <SectionLabel>Summary</SectionLabel>
+          <BulletList items={summary} className="text-[17px] leading-[1.45] tracking-[-0.01em]" />
         </section>
 
         <section className="mt-5 border-t border-white/[0.07] pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Traction</p>
-          <p className={`mt-2 font-medium leading-[1.05] tracking-[-0.035em] text-pearl ${metricSize}`}>{lead}</p>
-          {rest.length > 0 ? (
-            <ul className={`mt-2 space-y-1 ${open ? "" : "line-clamp-2"}`}>
-              {(open ? rest : rest.slice(0, 2)).map((part) => (
-                <li key={part} className="text-[13px] leading-snug text-pearl/50">
-                  {part}
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <SectionLabel>Signals</SectionLabel>
+          <BulletList items={signals} className="text-[15px] leading-snug" />
         </section>
-
-        {company.fundraising ? (
-          <section className="mt-5 border-t border-white/[0.07] pt-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Fundraising</p>
-            <p className={`mt-2 text-[14px] leading-snug text-pearl/75 ${open ? "" : "line-clamp-3"}`}>{company.fundraising}</p>
-          </section>
-        ) : null}
-
-        {company.team ? (
-          <section className="mt-5 border-t border-white/[0.07] pt-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Team</p>
-            <p className={`mt-2 text-[14px] leading-snug text-pearl/75 ${open ? "" : "line-clamp-3"}`}>{company.team}</p>
-          </section>
-        ) : null}
 
         <section className="mt-5 border-t border-white/[0.07] pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Why interesting</p>
-          <p className={`mt-2 text-[14px] leading-snug tracking-[-0.01em] text-pearl/75 ${open ? "" : "line-clamp-3"}`}>
-            {company.why_interesting}
-          </p>
+          <SectionLabel>Fundraising</SectionLabel>
+          <BulletList items={fundraising} className="text-[16px] leading-snug tracking-[-0.01em]" />
         </section>
 
-        {company.decision_hooks.length > 0 ? (
+        <section className="mt-5 border-t border-white/[0.07] pt-4">
+          <SectionLabel>Team</SectionLabel>
+          <BulletList items={team} className="text-[16px] leading-snug tracking-[-0.01em]" />
+        </section>
+
+        <section className="mt-5 border-t border-white/[0.07] pt-4">
+          <SectionLabel>Why interesting</SectionLabel>
+          <BulletList items={why} className="text-[16px] leading-snug tracking-[-0.01em]" />
+        </section>
+
+        {hooks.length > 0 ? (
           <section className="mt-5 border-t border-white/[0.07] pt-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Decision hooks</p>
-            <ul className="mt-2 space-y-2">
-              {company.decision_hooks.map((hook) => (
-                <li key={hook} className="flex gap-2.5 text-[13.5px] leading-snug text-pearl/75">
-                  <span aria-hidden="true" className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-ice/80" />
-                  <span className={open ? "" : "line-clamp-2"}>{hook}</span>
-                </li>
-              ))}
-            </ul>
+            <SectionLabel>Decision hooks</SectionLabel>
+            <BulletList items={hooks} className="text-[15.5px] leading-snug" />
           </section>
         ) : null}
 
-        {open && company.sector ? (
-          <section className="mt-5 border-t border-white/[0.07] pt-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">Sector</p>
-            <p className="mt-2 text-[13px] leading-snug text-pearl/55">{company.sector}</p>
-          </section>
+        {open ? (
+          <div className="mt-5 space-y-5 border-t border-white/[0.07] pt-4">
+            <section>
+              <SectionLabel>Seed summary</SectionLabel>
+              <p className="mt-2 break-words text-[15px] leading-snug text-pearl/60">{company.summary}</p>
+            </section>
+            <section>
+              <SectionLabel>Traction line</SectionLabel>
+              <p className="mt-2 break-words text-[15px] leading-snug text-pearl/60">{company.traction}</p>
+            </section>
+            {company.sources_note ? (
+              <section>
+                <SectionLabel>Sources</SectionLabel>
+                <p className="mt-2 break-words text-[15px] leading-snug text-pearl/55">{company.sources_note}</p>
+              </section>
+            ) : null}
+          </div>
         ) : null}
 
         <button
