@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { RotateCcw } from "lucide-react";
@@ -10,23 +10,29 @@ import { CompanyCard } from "./CompanyCard";
 import { DecisionBar } from "./DecisionBar";
 import { ReviewComplete } from "./ReviewComplete";
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
 const cardVariants: Variants = {
-  enter: { opacity: 0, y: 16, scale: 0.985 },
-  center: { opacity: 1, y: 0, scale: 1, x: 0, rotate: 0 },
+  enter: { opacity: 0, y: 14 },
+  center: { opacity: 1, y: 0, x: 0 },
   exit: (kind: ExitKind) => {
-    if (kind === "no") return { opacity: 0, x: -280, rotate: -4 };
-    if (kind === "yes") return { opacity: 0, x: 280, rotate: 4 };
-    if (kind === "dig") return { opacity: 0, y: 48, scale: 0.96 };
-    return { opacity: 0, y: -36, scale: 0.97 };
+    if (kind === "no") return { opacity: 0, x: -48 };
+    if (kind === "yes") return { opacity: 0, x: 48 };
+    if (kind === "dig") return { opacity: 0, y: 16 };
+    return { opacity: 0, y: -12 };
   },
 };
 
 export function ReviewScreen() {
   const queue = useReviewQueue(companies);
   const [lastExit, setLastExit] = useState<ExitKind>("maybe");
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const total = companies.length;
   const done = !queue.current;
-  const behind = queue.currentIndex >= 0 ? total - queue.currentIndex - 1 : 0;
+
+  useEffect(() => {
+    scrollerRef.current?.scrollTo({ top: 0 });
+  }, [queue.current?.id]);
 
   function handleVote(vote: Vote) {
     setLastExit(vote);
@@ -43,58 +49,46 @@ export function ReviewScreen() {
       className="absolute inset-0 flex flex-col bg-midnight"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
+      transition={{ duration: 0.45, ease }}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 h-56 w-[380px] -translate-x-1/2 rounded-full bg-aurora/10 blur-3xl"
-      />
-
       <header className="relative z-10 px-5 pb-3 pt-[max(1.35rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between">
-          <span className="text-[20px] font-light tracking-[-0.03em] text-pearl">sourcing</span>
-          <div className="flex items-center gap-3">
+          <span className="text-[17px] font-medium tracking-[-0.03em] text-pearl">sourcing</span>
+          <div className="flex items-center gap-2">
             <AnimatePresence>
               {queue.canUndo ? (
                 <motion.button
                   type="button"
                   onClick={queue.undo}
                   aria-label="Undo last action"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-pearl/55 ring-1 ring-white/10 transition-colors hover:text-ice hover:ring-ice/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex h-8 w-8 items-center justify-center text-pearl/40 transition-colors hover:text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
                 >
-                  <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.8} />
+                  <RotateCcw className="h-4 w-4" strokeWidth={1.75} />
                 </motion.button>
               ) : null}
             </AnimatePresence>
-            <span className="font-mono text-[12px] tabular-nums text-pearl/50" aria-live="polite">
+            <span className="font-mono text-[12px] tabular-nums text-pearl/40" aria-live="polite">
               {Math.min(queue.reviewedCount + (done ? 0 : 1), total)}
               <span className="text-pearl/25"> / {total}</span>
             </span>
           </div>
         </div>
-        <div className="mt-4 h-px w-full bg-white/[0.06]" aria-hidden="true">
+        <div className="mt-4 h-[2px] w-full overflow-hidden rounded-full bg-white/[0.06]" aria-hidden="true">
           <motion.div
-            className="h-px bg-ice/80"
-            style={{ boxShadow: "0 0 10px rgba(85,233,255,0.45)" }}
+            className="h-full rounded-full bg-ice"
             animate={{ width: `${(queue.reviewedCount / total) * 100}%` }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.4, ease }}
           />
         </div>
       </header>
 
       <div className="relative z-0 min-h-0 flex-1">
         {queue.current ? (
-          <div className="relative h-full px-4 pb-3 pt-1">
-            {behind > 0 ? (
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-7 bottom-1 top-3 rounded-[26px] bg-midnight-raised/70 ring-1 ring-white/[0.04]"
-              />
-            ) : null}
-            <AnimatePresence initial={false} custom={lastExit} mode="popLayout">
+          <div ref={scrollerRef} className="no-scrollbar h-full overflow-y-auto px-4 pb-4 pt-3">
+            <AnimatePresence mode="wait" initial={false} custom={lastExit}>
               <motion.div
                 key={queue.current.id}
                 custom={lastExit}
@@ -102,8 +96,7 @@ export function ReviewScreen() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                className="relative h-full"
+                transition={{ duration: 0.32, ease }}
               >
                 <CompanyCard company={queue.current} />
               </motion.div>
@@ -114,7 +107,13 @@ export function ReviewScreen() {
         )}
       </div>
 
-      {queue.current ? <DecisionBar onVote={handleVote} onDig={handleDig} /> : null}
+      <AnimatePresence>
+        {queue.current ? (
+          <motion.div key="actions" exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <DecisionBar onVote={handleVote} onDig={handleDig} />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </motion.main>
   );
 }

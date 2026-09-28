@@ -1,19 +1,22 @@
-import type { LucideIcon } from "lucide-react";
-
 interface FactRowProps {
-  icon: LucideIcon;
   label: string;
   value: string;
+  emphasis?: boolean;
 }
 
-export function FactRow({ icon: Icon, label, value }: FactRowProps) {
+export function FactRow({ label, value, emphasis = false }: FactRowProps) {
   return (
-    <div className="flex gap-3 py-3.5">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-pearl/40" strokeWidth={1.6} aria-hidden="true" />
-      <div className="min-w-0">
-        <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">{label}</dt>
-        <dd className="mt-1 text-[14px] leading-snug text-pearl/85">{value}</dd>
-      </div>
+    <div className={emphasis ? "mt-7" : "mt-5"}>
+      <dt className="text-[11px] font-medium uppercase tracking-[0.16em] text-pearl/40">{label}</dt>
+      <dd
+        className={
+          emphasis
+            ? "mt-2 text-[16px] font-medium leading-snug tracking-[-0.015em] text-pearl"
+            : "mt-1.5 text-[14px] leading-relaxed text-pearl/70"
+        }
+      >
+        {value}
+      </dd>
     </div>
   );
 }

@@ -32,6 +32,11 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+::selection {
+  background: rgba(85, 233, 255, 0.22);
+  color: #f3f4ee;
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

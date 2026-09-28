@@ -13,11 +13,7 @@ export function App() {
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-midnight-deep">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[-10%] h-[42vh] w-[78vw] max-w-3xl -translate-x-1/2 rounded-full bg-aurora/[0.08] blur-3xl"
-      />
-      <div className="relative h-dvh w-full shrink-0 overflow-hidden bg-midnight sm:h-[min(844px,calc(100dvh-32px))] sm:w-[390px] sm:rounded-[42px] sm:shadow-[0_40px_120px_rgba(0,0,0,0.55)] sm:ring-1 sm:ring-white/[0.08]">
+      <div className="relative h-dvh w-full shrink-0 overflow-hidden bg-midnight sm:h-[min(844px,calc(100dvh-32px))] sm:w-[390px] sm:rounded-[40px] sm:shadow-[0_24px_80px_rgba(0,0,0,0.45)] sm:ring-1 sm:ring-white/[0.06]">
         <AnimatePresence mode="wait">
           {phase === "video" ? <VideoIntro key="video" onDone={showTitle} /> : null}
           {phase === "title" ? <TitleBeat key="title" onDone={showReview} /> : null}
