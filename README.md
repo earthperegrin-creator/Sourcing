@@ -25,12 +25,12 @@ The five companies, in order:
 - Green Chem
 - PandaDoc
 
-Cards use the fields from that file: country, stage, summary, traction, fundraising, team, rubric lean, website, and LinkedIn when those values exist.
+Cards use the fields from that file. Traction is shown as a bold lead, with the rest of that field underneath. Country, stage, summary, fundraising, rubric lean, website, and LinkedIn appear when those values exist.
 
 ## Actions
 
-**No**, **Maybe**, and **Yes** are the review. Each one records a vote and advances to the next card.
+**No**, **Maybe**, and **Yes** are the primary row. Each one records a vote and the card eases to the next company.
 
-**Dig** means need more info. It is not a fourth vote. It parks the company for follow-up, advances the queue, and does not add a No / Maybe / Yes score. The closing screen lists votes on their own and keeps “Need more info” separate.
+**Dig** sits above that row. It means need more info. It parks the company for follow-up and does not add a Yes, Maybe, or No score. The Done screen shows those three counts, then lists flagged companies on their own.
 
 Undo sits in the header. Review again clears the queue without replaying the intro.

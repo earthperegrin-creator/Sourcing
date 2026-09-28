@@ -13,13 +13,13 @@ import { ReviewComplete } from "./ReviewComplete";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const cardVariants: Variants = {
-  enter: { opacity: 0, y: 14 },
-  center: { opacity: 1, y: 0, x: 0 },
+  enter: { opacity: 0, y: 22, scale: 0.985 },
+  center: { opacity: 1, y: 0, x: 0, scale: 1 },
   exit: (kind: ExitKind) => {
-    if (kind === "no") return { opacity: 0, x: -48 };
-    if (kind === "yes") return { opacity: 0, x: 48 };
-    if (kind === "dig") return { opacity: 0, y: 16 };
-    return { opacity: 0, y: -12 };
+    if (kind === "no") return { opacity: 0, x: -36, scale: 0.985 };
+    if (kind === "yes") return { opacity: 0, x: 36, scale: 0.985 };
+    if (kind === "dig") return { opacity: 0, y: 18, scale: 0.985 };
+    return { opacity: 0, y: -14, scale: 0.985 };
   },
 };
 
@@ -87,8 +87,8 @@ export function ReviewScreen() {
 
       <div className="relative z-0 min-h-0 flex-1">
         {queue.current ? (
-          <div ref={scrollerRef} className="no-scrollbar h-full overflow-y-auto px-4 pb-4 pt-3">
-            <AnimatePresence mode="wait" initial={false} custom={lastExit}>
+          <div ref={scrollerRef} className="no-scrollbar h-full overflow-x-hidden overflow-y-auto px-4 pb-5 pt-3">
+            <AnimatePresence mode="popLayout" initial={false} custom={lastExit}>
               <motion.div
                 key={queue.current.id}
                 custom={lastExit}
@@ -96,7 +96,7 @@ export function ReviewScreen() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.32, ease }}
+                transition={{ duration: 0.42, ease }}
               >
                 <CompanyCard company={queue.current} />
               </motion.div>

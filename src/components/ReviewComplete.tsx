@@ -8,9 +8,9 @@ interface ReviewCompleteProps {
 }
 
 const voteOrder: { key: Vote; label: string }[] = [
-  { key: "no", label: "No" },
-  { key: "maybe", label: "Maybe" },
   { key: "yes", label: "Yes" },
+  { key: "maybe", label: "Maybe" },
+  { key: "no", label: "No" },
 ];
 
 const listEase = [0.22, 1, 0.36, 1] as const;
@@ -22,7 +22,7 @@ export function ReviewComplete({ votes, digs, onRestart }: ReviewCompleteProps) 
     <motion.section
       aria-label="Review complete"
       className="no-scrollbar flex h-full flex-col overflow-y-auto px-5 pb-8 pt-2"
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: listEase }}
     >
@@ -35,38 +35,28 @@ export function ReviewComplete({ votes, digs, onRestart }: ReviewCompleteProps) 
             className="rounded-[20px] bg-midnight-raised px-3 py-4 ring-1 ring-white/[0.06]"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.05 + index * 0.05, ease: listEase }}
+            transition={{ duration: 0.4, delay: 0.04 + index * 0.04, ease: listEase }}
           >
-            <div className={`text-[32px] font-semibold leading-none tracking-[-0.04em] ${key === "yes" ? "text-ice" : "text-pearl"}`}>
-              {votes[key].length}
-            </div>
+            <div className="text-[32px] font-semibold leading-none tracking-[-0.04em] text-pearl">{votes[key].length}</div>
             <div className="mt-2 text-[12px] font-medium text-pearl/45">{label}</div>
           </motion.div>
         ))}
       </div>
 
-      {voted.length > 0 ? (
-        <ul className="mt-6 divide-y divide-white/[0.06] overflow-hidden rounded-[24px] bg-midnight-raised px-4 ring-1 ring-white/[0.06]">
-          {voted.map(({ company, label, key }) => (
-            <li key={company.id} className="flex items-center justify-between gap-3 py-3.5">
-              <span className="text-[15px] font-medium tracking-[-0.015em] text-pearl">{company.name}</span>
-              <span className={`text-[13px] ${key === "yes" ? "text-ice" : "text-pearl/45"}`}>{label}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-6 text-[14px] text-pearl/40">No votes this pass.</p>
-      )}
-
-      <div className="mt-4 rounded-[24px] bg-midnight-raised px-4 py-4 ring-1 ring-white/[0.06]">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="text-[13px] font-medium text-pearl/80">Need more info</h3>
-          <span className="text-[12px] text-pearl/35">Not a vote</span>
+      <motion.div
+        className="mt-3 rounded-[20px] bg-ice/[0.06] px-4 py-3.5 ring-1 ring-ice/25"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.16, ease: listEase }}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[13px] font-medium text-ice/90">Dig flagged</p>
+          <p className="text-[28px] font-semibold leading-none tracking-[-0.04em] text-ice">{digs.length}</p>
         </div>
         {digs.length === 0 ? (
-          <p className="mt-3 text-[14px] text-pearl/40">None parked.</p>
+          <p className="mt-2 text-[14px] text-pearl/45">None flagged.</p>
         ) : (
-          <ul className="mt-3 space-y-2.5">
+          <ul className="mt-2 space-y-1">
             {digs.map((company: Company) => (
               <li key={company.id} className="text-[15px] font-medium tracking-[-0.015em] text-pearl">
                 {company.name}
@@ -74,7 +64,20 @@ export function ReviewComplete({ votes, digs, onRestart }: ReviewCompleteProps) 
             ))}
           </ul>
         )}
-      </div>
+      </motion.div>
+
+      {voted.length > 0 ? (
+        <ul className="mt-5 divide-y divide-white/[0.06] overflow-hidden rounded-[24px] bg-midnight-raised px-4 ring-1 ring-white/[0.06]">
+          {voted.map(({ company, label }) => (
+            <li key={company.id} className="flex items-center justify-between gap-3 py-3.5">
+              <span className="text-[15px] font-medium tracking-[-0.015em] text-pearl">{company.name}</span>
+              <span className="text-[13px] text-pearl/45">{label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-5 text-[14px] text-pearl/40">No votes this pass.</p>
+      )}
 
       <button
         type="button"
