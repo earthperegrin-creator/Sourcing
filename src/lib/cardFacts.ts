@@ -30,7 +30,8 @@ function withheld(value: string | null | undefined): boolean {
   return WITHHELD.has(value.trim());
 }
 
-function partsOf(traction: string): string[] {
+function partsOf(traction: string | null | undefined): string[] {
+  if (!traction) return [];
   return traction
     .split(/\s*;\s*/)
     .map((part) => part.trim())

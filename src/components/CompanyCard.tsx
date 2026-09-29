@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { Globe, Landmark, Linkedin } from "lucide-react";
 import { briefFor } from "../data/briefs";
 import { countryLabel } from "../lib/countries";
 import { jobBoardMetrics, signalBullets, type BoardMetric } from "../lib/cardFacts";
+import { sourceLinksFor, type SourceKind } from "../lib/sourceLinks";
 import type { Company } from "../types/company";
 
 interface CompanyCardProps {
@@ -75,16 +76,48 @@ function SectionLabel({ children }: { children: string }) {
   return <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">{children}</p>;
 }
 
+const sourceButtonClass =
+  "inline-flex h-8 items-center justify-center rounded-full bg-white/[0.04] text-pearl/75 ring-1 ring-white/[0.1] transition-colors hover:text-ice hover:ring-ice/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50";
+
+function SourceMark({ kind }: { kind: SourceKind }) {
+  if (kind === "104") {
+    return <span className="font-mono text-[11px] font-semibold tracking-[-0.04em]">104</span>;
+  }
+  if (kind === "website") return <Globe className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />;
+  if (kind === "linkedin") return <Linkedin className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />;
+  return <Landmark className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />;
+}
+
+function SourceLinks({ company }: { company: Company }) {
+  const links = sourceLinksFor(company);
+  if (links.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5" aria-label="Company sources">
+      {links.map((link) => (
+        <a
+          key={link.kind}
+          href={link.href}
+          target="_blank"
+          rel="noreferrer noopener"
+          aria-label={link.label}
+          title={link.label}
+          data-source={link.kind}
+          className={`${sourceButtonClass} ${link.kind === "104" ? "px-2" : "w-8"}`}
+        >
+          <SourceMark kind={link.kind} />
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export function CompanyCard({ company, muted = false }: CompanyCardProps) {
   const [open, setOpen] = useState(false);
   const country = countryLabel(company.country);
   const brief = briefFor(company.slug);
   const metrics = jobBoardMetrics(company);
   const signals = signalBullets(company);
-  const links = [
-    ...(company.website_url ? [{ href: company.website_url, label: "Website" }] : []),
-    ...(company.linkedin_url ? [{ href: company.linkedin_url, label: "LinkedIn" }] : []),
-  ];
 
   const summary = brief?.summary ?? [company.summary];
   const why = brief?.why ?? [company.why_interesting];
@@ -108,6 +141,7 @@ export function CompanyCard({ company, muted = false }: CompanyCardProps) {
         </div>
 
         <h2 className="mt-5 text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] text-pearl">{company.name}</h2>
+        <SourceLinks company={company} />
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <span className="inline-flex h-6 items-center rounded-full bg-white/[0.04] px-2.5 text-[12px] font-medium text-pearl/80 ring-1 ring-white/[0.1]">
@@ -172,7 +206,7 @@ export function CompanyCard({ company, muted = false }: CompanyCardProps) {
             </section>
             <section>
               <SectionLabel>Traction line</SectionLabel>
-              <p className="mt-2 break-words text-[15px] leading-snug text-pearl/60">{company.traction}</p>
+              <p className="mt-2 break-words text-[15px] leading-snug text-pearl/60">{company.traction ?? "Not in this record."}</p>
             </section>
             {company.sources_note ? (
               <section>
@@ -191,23 +225,6 @@ export function CompanyCard({ company, muted = false }: CompanyCardProps) {
         >
           {open ? "Hide details" : "Details"}
         </button>
-
-        {links.length > 0 ? (
-          <div className="mt-4 overflow-hidden rounded-[18px] bg-black/20 ring-1 ring-white/[0.06]">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-between gap-3 border-t border-white/[0.06] px-4 py-3.5 text-[14px] font-medium text-pearl first:border-t-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50"
-              >
-                {link.label}
-                <ChevronRight className="h-4 w-4 text-pearl/35" strokeWidth={1.8} aria-hidden="true" />
-              </a>
-            ))}
-          </div>
-        ) : null}
       </div>
     </article>
   );

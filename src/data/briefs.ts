@@ -464,10 +464,11 @@ export function briefFor(slug: string): DecisionBrief | null {
   return briefs[slug] ?? null;
 }
 
-export function assertBriefsCover(slugs: string[]): void {
-  const missing = slugs.filter((slug) => !briefs[slug]);
-  const extra = Object.keys(briefs).filter((slug) => !slugs.includes(slug));
-  if (missing.length > 0 || extra.length > 0) {
-    throw new Error(`Brief mismatch. Missing: ${missing.join(", ") || "none"}. Extra: ${extra.join(", ") || "none"}.`);
+/** Hand-written briefs are optional. Every brief that exists must match a company in this list. */
+export function assertBriefsExist(slugs: string[]): void {
+  const present = new Set(slugs);
+  const missing = Object.keys(briefs).filter((slug) => !present.has(slug));
+  if (missing.length > 0) {
+    throw new Error(`Briefs missing from company list: ${missing.join(", ")}`);
   }
 }

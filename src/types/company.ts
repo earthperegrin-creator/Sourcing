@@ -6,11 +6,14 @@ export interface Company {
   name: string;
   country: string;
   stage: string | null;
-  website_url: string;
+  website_url: string | null;
   linkedin_url: string | null;
+  twincn_url: string | null;
+  url_104: string | null;
+  job_board_104_url: string | null;
   sector: string | null;
   summary: string;
-  traction: string;
+  traction: string | null;
   fundraising: string | null;
   team: string | null;
   rubric_lean: string;
