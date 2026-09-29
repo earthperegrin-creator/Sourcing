@@ -3,30 +3,25 @@ import type { Company, Vote } from "../types/company";
 
 export type ExitKind = Vote | "dig";
 
-interface HistoryEntry {
+export interface HistoryEntry {
   id: string;
   kind: ExitKind;
 }
 
 /**
- * No / Maybe / Yes are votes. Dig is a separate "need more info" flag:
- * it parks the company and advances the queue without recording a score.
+ * No / Maybe / Yes are votes. Dig is a separate "need more info" flag.
+ * One row per company is written to Supabase by the review screen.
  */
-export function useReviewQueue(items: Company[]) {
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+export function useReviewQueue(items: Company[], initialHistory: HistoryEntry[] = []) {
+  const [history, setHistory] = useState<HistoryEntry[]>(initialHistory);
 
   const handled = useMemo(() => new Set(history.map((entry) => entry.id)), [history]);
   const currentIndex = items.findIndex((company) => !handled.has(company.id));
   const current = currentIndex === -1 ? null : items[currentIndex];
 
-  const act = useCallback(
-    (kind: ExitKind) => {
-      if (!current) return;
-      const id = current.id;
-      setHistory((prev) => (prev.some((entry) => entry.id === id) ? prev : [...prev, { id, kind }]));
-    },
-    [current],
-  );
+  const record = useCallback((id: string, kind: ExitKind) => {
+    setHistory((prev) => (prev.some((entry) => entry.id === id) ? prev : [...prev, { id, kind }]));
+  }, []);
 
   const undo = useCallback(() => {
     setHistory((prev) => prev.slice(0, -1));
@@ -64,11 +59,11 @@ export function useReviewQueue(items: Company[]) {
     next,
     currentIndex,
     reviewedCount: history.length,
+    handled,
     canUndo: history.length > 0,
     votes,
     digs,
-    vote: (vote: Vote) => act(vote),
-    dig: () => act("dig"),
+    record,
     undo,
     reset,
   };

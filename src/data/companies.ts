@@ -1,7 +1,12 @@
 import raw from "./companies.json";
-import { assertBriefsCover } from "./briefs";
+import { assertBriefsExist } from "./briefs";
+import { toCompany } from "../lib/companyRecord";
 import type { Company } from "../types/company";
 
-export const companies = raw as Company[];
+const rows = Array.isArray(raw) ? raw : [];
 
-assertBriefsCover(companies.map((company) => company.slug));
+export const seedCompanies: Company[] = rows
+  .map((row) => toCompany(row))
+  .filter((company): company is Company => company !== null);
+
+assertBriefsExist(seedCompanies.map((company) => company.slug));

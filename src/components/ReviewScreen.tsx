@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { RotateCcw } from "lucide-react";
-import { companies } from "../data/companies";
 import { useReviewQueue } from "../hooks/useReviewQueue";
 import type { ExitKind } from "../hooks/useReviewQueue";
-import type { Vote } from "../types/company";
+import type { CompanySourceState } from "../hooks/useCompanySource";
+import { historyFromReviews, saveReview, type SavedReview } from "../lib/queue";
+import type { Company } from "../types/company";
 import { AuroraBackdrop } from "./AuroraBackdrop";
 import { CompanyCard } from "./CompanyCard";
 import { DecisionBar } from "./DecisionBar";
@@ -24,26 +25,54 @@ const cardVariants: Variants = {
   },
 };
 
-export function ReviewScreen() {
-  const queue = useReviewQueue(companies);
+function notesFromReviews(reviews: SavedReview[]): Map<string, string> {
+  const notes = new Map<string, string>();
+  for (const review of reviews) {
+    if (review.comment) notes.set(review.companyId, review.comment);
+  }
+  return notes;
+}
+
+function ReviewSession({
+  companies,
+  reviews,
+  persisted,
+}: {
+  companies: Company[];
+  reviews: SavedReview[];
+  persisted: boolean;
+}) {
+  const initialHistory = useMemo(() => historyFromReviews(companies, reviews), [companies, reviews]);
+  const queue = useReviewQueue(companies, initialHistory);
+  const [notes, setNotes] = useState(() => notesFromReviews(reviews));
   const [lastExit, setLastExit] = useState<ExitKind>("maybe");
   const scrollerRef = useRef<HTMLDivElement>(null);
   const total = companies.length;
   const done = !queue.current;
   const position = Math.min(queue.reviewedCount + (done ? 0 : 1), total);
+  const initialComment = queue.current ? notes.get(queue.current.id) ?? "" : "";
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: 0 });
   }, [queue.current?.id]);
 
-  function handleVote(vote: Vote) {
-    setLastExit(vote);
-    queue.vote(vote);
-  }
-
-  function handleDig() {
-    setLastExit("dig");
-    queue.dig();
+  async function handleCommit(kind: ExitKind, comment: string) {
+    const company = queue.current;
+    if (!company) return;
+    const text = comment.trim();
+    await saveReview({
+      companyId: company.id,
+      kind,
+      comment: text.length > 0 ? text : null,
+    });
+    setNotes((prev) => {
+      const next = new Map(prev);
+      if (text) next.set(company.id, text);
+      else next.delete(company.id);
+      return next;
+    });
+    setLastExit(kind);
+    queue.record(company.id, kind);
   }
 
   return (
@@ -74,6 +103,7 @@ export function ReviewScreen() {
                 </motion.button>
               ) : null}
             </AnimatePresence>
+            {!persisted ? <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-pearl/35">Local</span> : null}
             <span className="font-mono text-[12px] tabular-nums tracking-[0.02em] text-pearl/55" aria-live="polite">
               {String(position).padStart(2, "0")}
               <span className="text-pearl/25"> / {String(total).padStart(2, "0")}</span>
@@ -81,12 +111,15 @@ export function ReviewScreen() {
           </div>
         </div>
         <div
-          className="mt-4 grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}
+          className="mt-4 grid"
+          style={{
+            gridTemplateColumns: `repeat(${Math.max(total, 1)}, minmax(0, 1fr))`,
+            columnGap: total > 40 ? 2 : 4,
+          }}
           aria-hidden="true"
         >
-          {companies.map((company, index) => {
-            const decided = index < queue.reviewedCount;
+          {companies.map((company) => {
+            const decided = queue.handled.has(company.id);
             const isCurrent = queue.current?.id === company.id;
             return (
               <div key={company.id} className="h-[2px] overflow-hidden rounded-full bg-white/[0.07]">
@@ -97,7 +130,7 @@ export function ReviewScreen() {
                     width: decided || isCurrent ? "100%" : "0%",
                     backgroundColor: isCurrent ? "rgba(85,233,255,0.9)" : "rgba(243,244,238,0.45)",
                   }}
-                  transition={{ duration: 0.45, delay: index * 0.02, ease }}
+                  transition={{ duration: 0.35, ease }}
                 />
               </div>
             );
@@ -137,10 +170,26 @@ export function ReviewScreen() {
       <AnimatePresence>
         {queue.current ? (
           <motion.div key="actions" exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <DecisionBar onVote={handleVote} onDig={handleDig} />
+            <DecisionBar companyId={queue.current.id} initialComment={initialComment} onCommit={handleCommit} />
           </motion.div>
         ) : null}
       </AnimatePresence>
     </motion.main>
   );
+}
+
+export function ReviewScreen({ source }: { source: CompanySourceState }) {
+  if (source.status !== "ready") {
+    return (
+      <main className="absolute inset-0 flex flex-col bg-midnight">
+        <AuroraBackdrop variant="ambient" />
+        <header className="relative z-20 px-6 pt-[max(1.15rem,env(safe-area-inset-top))] sm:pt-[62px]">
+          <span className="text-[21px] font-light leading-none tracking-[-0.045em] text-pearl">sourcing</span>
+        </header>
+        <p className="relative z-10 px-6 pt-10 text-[16px] text-pearl/55">Loading companies</p>
+      </main>
+    );
+  }
+
+  return <ReviewSession companies={source.companies} reviews={source.reviews} persisted={source.persisted} />;
 }
