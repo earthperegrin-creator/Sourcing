@@ -120,7 +120,7 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
           <button
             type="button"
             onClick={playFromTap}
-            className="mb-3 h-11 rounded-full bg-pearl px-6 text-[14px] font-medium text-midnight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice"
+            className="mb-3 h-11 rounded-md bg-pearl px-6 text-[14px] font-medium text-midnight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice"
           >
             Play
           </button>
@@ -128,7 +128,7 @@ export function VideoIntro({ onDone }: VideoIntroProps) {
         <button
           type="button"
           onClick={beginDim}
-          className="rounded-full border border-white/30 bg-midnight-deep/55 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-pearl backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-midnight-deep/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
+          className="rounded-md border border-white/40 bg-midnight-deep px-3 py-1.5 text-[11px] font-medium tracking-wide text-pearl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/60"
         >
           Skip
         </button>

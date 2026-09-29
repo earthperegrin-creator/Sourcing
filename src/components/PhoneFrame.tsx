@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { GrainOverlay } from "./GrainOverlay";
 
 export function PhoneFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-[#04060F] sm:py-8">
-      <div className="w-full sm:w-auto sm:rounded-[54px] sm:bg-[#0B0E1A] sm:p-[10px] sm:shadow-[0_50px_140px_rgba(0,0,0,0.7)] sm:ring-1 sm:ring-white/[0.09]">
+    <div className="flex min-h-dvh w-full items-center justify-center bg-background sm:py-8">
+      <div className="w-full sm:w-auto sm:rounded-[54px] sm:bg-[#0c0c0e] sm:p-[10px] sm:shadow-[0_24px_80px_rgba(0,0,0,0.45)] sm:ring-1 sm:ring-white/10">
         <div className="relative h-dvh w-full overflow-hidden bg-midnight sm:aspect-[9/16] sm:h-[min(844px,calc(100dvh-64px))] sm:w-auto sm:rounded-[44px]">
           <div
             aria-hidden="true"
@@ -22,7 +21,6 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
             </span>
           </div>
           {children}
-          <GrainOverlay />
           <div
             aria-hidden="true"
             className="pointer-events-none absolute bottom-2 left-1/2 z-[70] hidden h-[5px] w-[134px] -translate-x-1/2 rounded-full bg-pearl/70 sm:block"

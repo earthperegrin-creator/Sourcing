@@ -1,6 +1,6 @@
 # sourcing
 
-Personal deal-sourcing and company-review app. Mobile-first, phone-width, Arctic palette: midnight indigo, pearl snow, a restrained cyan line.
+Personal deal-sourcing and company-review app. Mobile-first, dark, built as a research card rather than a glow template.
 
 ## Run
 
@@ -14,18 +14,16 @@ Open the URL Vite prints (usually http://localhost:5173). On a wide screen the U
 ## Flow
 
 1. **Garden stroll.** `public/intro/arctic-garden-stroll.mp4` autoplays muted and full-bleed inside the phone (`playsInline` on mobile). It is the opening footage, not a still. Near the end the frame fades to black. Skip is at the bottom.
-2. **Title.** A dark screen with the word **sourcing**. It holds, then continues. Tap to go on.
-3. **Review.** One company card at a time. The queue loads from Supabase `public.companies`, in the same order as `src/data/companies.json`. If that request fails or comes back empty, the app uses that JSON file (98 Taiwan companies).
+2. **Title.** The screen is dark, the word **sourcing** appears, and a thin blue line glides across. It holds, then continues. Tap to go on.
+3. **Review.** One company card at a time. The queue loads from Supabase `public.companies` (`select *`), in the same order as `src/data/companies.json`. If that request fails or comes back empty, the app uses that JSON file (98 Taiwan companies).
 
-Cards keep the larger body type, short bullets, and the 104.com metric row (headcount, open jobs, hiring). Unknown headcount stays unknown. A compact icon row sits under the company name: website, TwinCN incorporation, a **104** badge, and LinkedIn. Each opens in a new tab and hides when its URL is null. Summary, signals, fundraising, team, why interesting, and decision hooks stay as bullets. The first twenty slugs still use the shorter handwritten briefs. Details opens the original summary, the raw traction line, and sources.
+Each card is the brief. Visible without another screen: the name, `kind_plain` as a short label, `what_it_is` as one or two sentences, 104 headcount and open jobs, two or three short decision hooks, and icon links. `what_it_is` and `kind_plain` are read from the row when those columns are present. If `what_it_is` is null, the sentence is taken only from that row's summary, sector, and decision hooks. Links are website, TwinCN, a small **104** badge (`url_104` or `job_board_104_url`), and LinkedIn. A null URL is omitted.
 
 ## Actions
 
-**No**, **Maybe**, and **Yes** are the primary row. The first tap opens a **Note** field. Type a comment, or leave it empty, then tap **Save** or tap the same vote again. The card then moves on.
+**No**, **Maybe**, and **Yes** are the vote row. **Dig** sits above them and means need more info. It is not a fourth vote.
 
-**Dig** sits above that row. It means need more info. The same note field opens, and the save writes `dig: true` without a Yes / Maybe / No score.
-
-The note is a normal textarea (`inputMode="text"`) with `data-voice-target="review-comment"` so a later ElevenLabs control can attach to it. This build does not call ElevenLabs.
+The comment box is always on screen (`data-voice-target="review-comment"`). The first tap arms a choice. Tap it again, or tap **Save**, to upsert `public.reviews` (`company_id`, `vote`, `dig`, `comment`). This build does not call ElevenLabs.
 
 Votes upsert one row per company in `public.reviews` (`company_id`, `vote`, `dig`, `comment`). A refresh resumes companies that already have a vote or a dig. Undo puts the last card back in this session. Review again clears the on-screen queue without replaying the intro and without deleting saved rows. The next pass overwrites them on save.
 
