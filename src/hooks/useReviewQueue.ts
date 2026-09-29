@@ -5,15 +5,26 @@ export type ExitKind = Vote | "dig";
 
 export interface HistoryEntry {
   id: string;
-  kind: ExitKind;
+  kind: ExitKind | "row";
+}
+
+function historyKey(entries: HistoryEntry[]): string {
+  return entries.map((entry) => `${entry.id}:${entry.kind}`).join("|");
 }
 
 /**
  * No / Maybe / Yes are votes. Dig is a separate "need more info" flag.
- * One row per company is written to Supabase by the review screen.
+ * Saved review rows decide the open card. If those rows arrive after the
+ * first render, an untouched queue adopts them instead of staying on company 1.
  */
 export function useReviewQueue(items: Company[], initialHistory: HistoryEntry[] = []) {
   const [history, setHistory] = useState<HistoryEntry[]>(initialHistory);
+  const [appliedKey, setAppliedKey] = useState(() => historyKey(initialHistory));
+  const nextKey = historyKey(initialHistory);
+  if (appliedKey !== nextKey) {
+    setAppliedKey(nextKey);
+    if (historyKey(history) === appliedKey) setHistory(initialHistory);
+  }
 
   const handled = useMemo(() => new Set(history.map((entry) => entry.id)), [history]);
   const currentIndex = items.findIndex((company) => !handled.has(company.id));
@@ -36,7 +47,7 @@ export function useReviewQueue(items: Company[], initialHistory: HistoryEntry[] 
   const votes = useMemo(() => {
     const grouped: Record<Vote, Company[]> = { no: [], maybe: [], yes: [] };
     for (const entry of history) {
-      if (entry.kind === "dig") continue;
+      if (entry.kind !== "no" && entry.kind !== "maybe" && entry.kind !== "yes") continue;
       const company = byId.get(entry.id);
       if (company) grouped[entry.kind].push(company);
     }
