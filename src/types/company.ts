@@ -25,4 +25,6 @@ export interface Company {
   open_jobs_104: string | null;
   open_jobs_104_num: number | null;
   hiring_activity_104: string | null;
+  what_it_is: string | null;
+  kind_plain: string | null;
 }

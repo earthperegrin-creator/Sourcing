@@ -50,5 +50,7 @@ export function toCompany(row: unknown): Company | null {
     open_jobs_104: asString(record.open_jobs_104),
     open_jobs_104_num: asNumber(record.open_jobs_104_num),
     hiring_activity_104: asString(record.hiring_activity_104),
+    what_it_is: asString(record.what_it_is),
+    kind_plain: asString(record.kind_plain),
   };
 }

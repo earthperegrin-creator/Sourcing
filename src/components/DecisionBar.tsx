@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Check, Minus, Search, X } from "lucide-react";
 import type { ExitKind } from "../hooks/useReviewQueue";
 import type { Vote } from "../types/company";
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 interface DecisionBarProps {
   companyId: string;
@@ -84,84 +86,64 @@ export function DecisionBar({ companyId, initialComment = "", onCommit, disabled
   }, [choose, disabled]);
 
   return (
-    <div className="relative z-20 px-4 pb-[max(1.35rem,env(safe-area-inset-bottom))] pt-3 sm:pb-8">
-      {armed ? (
-        <div className="mb-3">
-          <label htmlFor="review-comment" className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.16em] text-pearl/40">
-            Note
-          </label>
-          {/* Voice-ready hook: a later ElevenLabs control can target [data-voice-target="review-comment"]. */}
-          <textarea
-            id="review-comment"
-            name="comment"
-            rows={2}
-            value={comment}
-            inputMode="text"
-            enterKeyHint="send"
-            autoComplete="off"
-            autoCapitalize="sentences"
-            placeholder="Comment"
-            disabled={saving}
-            data-voice-target="review-comment"
-            data-company-id={companyId}
-            onChange={(event) => setComment(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void commit();
-              }
-            }}
-            className="w-full resize-none rounded-[16px] border border-white/[0.09] bg-midnight-raised px-3 py-2.5 text-[16px] leading-snug tracking-[-0.01em] text-pearl shadow-[inset_0_1px_0_rgba(243,244,238,0.06)] placeholder:text-pearl/35 focus:border-ice/50 focus:outline-none focus:ring-2 focus:ring-ice/25 disabled:opacity-60"
-          />
-          <button
-            type="button"
-            onClick={() => void commit()}
-            disabled={saving}
-            className="mt-2 flex h-10 w-full items-center justify-center rounded-[14px] bg-ice/[0.12] text-[14px] font-medium tracking-[-0.01em] text-ice ring-1 ring-ice/35 transition-colors hover:bg-ice/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50 disabled:opacity-50"
-          >
-            {saving ? "Saving" : `Save ${kindLabel(armed)}`}
-          </button>
-          {error ? <p className="mt-2 text-[13px] leading-snug text-pearl/70">{error}</p> : null}
-        </div>
-      ) : null}
+    <div className="relative z-20 border-t border-border bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
+      <label htmlFor="review-comment" className="mb-1.5 block text-xs text-muted-foreground">
+        Comment
+      </label>
+      <Textarea
+        id="review-comment"
+        name="comment"
+        rows={2}
+        value={comment}
+        inputMode="text"
+        enterKeyHint="done"
+        autoComplete="off"
+        autoCapitalize="sentences"
+        placeholder="Comment"
+        disabled={saving}
+        data-voice-target="review-comment"
+        data-company-id={companyId}
+        onChange={(event) => setComment(event.target.value)}
+      />
+      {error ? <p className="mt-2 text-sm text-foreground">{error}</p> : null}
 
-      <div className="mb-3 flex items-center justify-between px-1">
-        <button
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <Button
           type="button"
+          variant={armed === "dig" ? "secondary" : "outline"}
+          size="sm"
           disabled={disabled || saving}
           onClick={() => choose("dig")}
           aria-pressed={armed === "dig"}
-          className={`flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium tracking-[-0.005em] ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/50 disabled:opacity-40 ${
-            armed === "dig"
-              ? "bg-ice/[0.1] text-ice ring-ice/40"
-              : "bg-white/[0.03] text-pearl/70 ring-white/[0.1] hover:text-pearl hover:ring-white/20"
-          }`}
         >
-          <Search className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+          <Search className="size-3.5" strokeWidth={2} aria-hidden="true" />
           Dig
-        </button>
-        <span className="text-[12px] tracking-[-0.005em] text-pearl/35">{armed ? "Tap again to save" : "Need more info"}</span>
+        </Button>
+        <span className="text-xs text-muted-foreground">{armed ? "Tap again to save" : "Need more info"}</span>
       </div>
 
-      <div role="group" aria-label="Your call" className="grid grid-cols-3 gap-2">
+      {armed ? (
+        <Button type="button" variant="secondary" className="mt-2 w-full" disabled={saving} onClick={() => void commit()}>
+          {saving ? "Saving" : `Save ${kindLabel(armed)}`}
+        </Button>
+      ) : null}
+
+      <div role="group" aria-label="Your call" className="mt-2 grid grid-cols-3 gap-2">
         {votes.map(({ value, label, icon: Icon }) => {
           const selected = armed === value;
           return (
-            <button
+            <Button
               key={value}
               type="button"
+              variant={selected ? "default" : "outline"}
+              size="lg"
               disabled={disabled || saving}
               onClick={() => choose(value)}
               aria-pressed={selected}
-              className={`flex h-[58px] items-center justify-center gap-2 rounded-[18px] border bg-midnight-raised text-[15px] font-medium tracking-[-0.015em] shadow-[inset_0_1px_0_rgba(243,244,238,0.06)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice/25 active:scale-[0.98] disabled:opacity-40 ${
-                selected
-                  ? "border-ice/70 text-ice"
-                  : "border-white/[0.09] text-pearl hover:border-ice/40 focus-visible:border-ice/60"
-              }`}
             >
-              <Icon className="h-[17px] w-[17px] opacity-60" strokeWidth={1.8} aria-hidden="true" />
+              <Icon className="size-4" strokeWidth={1.75} aria-hidden="true" />
               {label}
-            </button>
+            </Button>
           );
         })}
       </div>
