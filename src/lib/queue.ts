@@ -67,11 +67,11 @@ function mapReviews(rows: unknown): SavedReview[] {
 export function historyFromReviews(companies: Company[], reviews: SavedReview[]): HistoryEntry[] {
   const allowed = new Set(companies.map((company) => company.id));
   return [...reviews]
-    .filter((review) => allowed.has(review.companyId) && (review.vote !== null || review.dig))
+    .filter((review) => allowed.has(review.companyId))
     .sort((a, b) => (a.updatedAt ?? "").localeCompare(b.updatedAt ?? ""))
     .map((review) => ({
       id: review.companyId,
-      kind: review.vote ?? "dig",
+      kind: review.vote ?? (review.dig ? "dig" : "row"),
     }));
 }
 
