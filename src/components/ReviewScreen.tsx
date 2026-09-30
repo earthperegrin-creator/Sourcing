@@ -76,7 +76,7 @@ function ReviewSession({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35, ease }}
     >
-      <header className="relative z-20 border-b border-border px-4 pt-[max(0.85rem,env(safe-area-inset-top))] pb-3 sm:pt-[62px]">
+      <header className="relative z-20 shrink-0 border-b border-border px-4 pt-[max(0.85rem,env(safe-area-inset-top))] pb-3 sm:pt-[62px]">
         <div className="flex h-8 items-center justify-between gap-3">
           <span className="text-sm font-medium tracking-tight text-foreground">sourcing</span>
           <div className="flex items-center gap-2">
@@ -123,7 +123,7 @@ function ReviewSession({
 
       <AnimatePresence>
         {queue.current ? (
-          <motion.div key="actions" exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+          <motion.div key="actions" className="shrink-0" exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             <DecisionBar companyId={queue.current.id} initialComment={initialComment} onCommit={handleCommit} />
           </motion.div>
         ) : null}

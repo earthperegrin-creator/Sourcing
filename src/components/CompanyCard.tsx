@@ -1,6 +1,6 @@
 import { Globe, Landmark, Linkedin } from "lucide-react";
-import { jobBoardMetrics } from "../lib/cardFacts";
-import { decisionHookLines, kindLabel, whatItIs } from "../lib/plainCompany";
+import { cardAbout, cardBullets, countOrNull } from "../lib/cardBrief";
+import { kindLabel } from "../lib/plainCompany";
 import { sourceLinksFor, type SourceKind } from "../lib/sourceLinks";
 import type { Company } from "../types/company";
 import { Badge } from "./ui/badge";
@@ -50,12 +50,42 @@ function Fact({ label, value, hint }: { label: string; value: string; hint: stri
   );
 }
 
+function BoardNumbers({ headcount, jobs }: { headcount: number | null; jobs: number | null }) {
+  const tiles = [
+    headcount != null ? { id: "headcount", label: "Headcount", value: String(headcount), hint: "people" } : null,
+    jobs != null ? { id: "jobs", label: "Open jobs", value: String(jobs), hint: "posts" } : null,
+  ].filter((tile): tile is { id: string; label: string; value: string; hint: string } => tile !== null);
+
+  if (tiles.length === 0) return null;
+
+  return (
+    <>
+      <Separator />
+      <CardContent className="px-4 py-3">
+        <p className="text-xs text-muted-foreground">104</p>
+        <div className={cn("mt-2 grid gap-3", tiles.length > 1 && "grid-cols-2")}>
+          {tiles.map((tile, index) => (
+            <div
+              key={tile.id}
+              data-metric={tile.id}
+              className={index > 0 ? "border-l border-border pl-3" : undefined}
+            >
+              <Fact label={tile.label} value={tile.value} hint={tile.hint} />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </>
+  );
+}
+
 export function CompanyCard({ company }: { company: Company }) {
-  const kind = kindLabel(company);
-  const about = whatItIs(company);
-  const hooks = decisionHookLines(company.decision_hooks);
-  const metrics = jobBoardMetrics(company).filter((metric) => metric.id !== "hiring");
-  const [headcount, jobs] = metrics;
+  const kind = company.kind_plain?.trim() || kindLabel(company);
+  const stage = company.stage?.trim() ?? "";
+  const about = cardAbout(company);
+  const bullets = cardBullets(company, about);
+  const headcount = countOrNull(company.headcount_104_num);
+  const jobs = countOrNull(company.open_jobs_104_num);
 
   return (
     <Card aria-label={company.name} className="gap-0 rounded-xl py-0 shadow-sm">
@@ -64,37 +94,41 @@ export function CompanyCard({ company }: { company: Company }) {
           <CardTitle className="min-w-0 text-xl leading-tight tracking-tight break-words">{company.name}</CardTitle>
           <SourceLinks company={company} />
         </div>
-        <Badge variant="outline" data-kind={kind}>
-          {kind}
-        </Badge>
+        {kind || stage ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {kind ? (
+              <Badge variant="outline" data-kind={kind} className="h-auto max-w-full overflow-visible whitespace-normal text-left">
+                {kind}
+              </Badge>
+            ) : null}
+            {stage ? (
+              <Badge variant="outline" data-stage={stage} className="h-auto max-w-full overflow-visible whitespace-normal text-left">
+                {stage}
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
       </CardHeader>
       <Separator />
       <CardContent className="px-4 py-3">
-        <p className="text-sm leading-6 text-foreground" data-what-it-is>
+        <p className="text-sm leading-6 break-words whitespace-normal text-foreground" data-what-it-is>
           {about}
         </p>
       </CardContent>
-      <Separator />
-      <CardContent className="px-4 py-3">
-        <p className="text-xs text-muted-foreground">104</p>
-        <div className="mt-2 grid grid-cols-2 gap-3">
-          {headcount ? <Fact label="Headcount" value={headcount.value} hint={headcount.hint} /> : null}
-          {jobs ? (
-            <div className="border-l border-border pl-3">
-              <Fact label="Open jobs" value={jobs.value} hint={jobs.hint} />
-            </div>
-          ) : null}
-        </div>
-      </CardContent>
-      {hooks.length > 0 ? (
+      <BoardNumbers headcount={headcount} jobs={jobs} />
+      {bullets.length > 0 ? (
         <>
           <Separator />
           <CardContent className="px-4 py-3">
-            <p className="text-xs text-muted-foreground">Decision hooks</p>
-            <ul className="mt-2 space-y-2">
-              {hooks.map((hook, index) => (
-                <li key={`${index}-${hook.slice(0, 24)}`} className="text-sm leading-5 text-foreground">
-                  {hook}
+            <ul className="list-disc space-y-2 pl-4">
+              {bullets.map((bullet, index) => (
+                <li
+                  key={`${bullet.label ?? "hook"}-${index}`}
+                  data-bullet={bullet.label ?? "hook"}
+                  className="text-sm leading-5 break-words whitespace-normal text-foreground"
+                >
+                  {bullet.label ? <span className="text-muted-foreground">{bullet.label}. </span> : null}
+                  {bullet.text}
                 </li>
               ))}
             </ul>

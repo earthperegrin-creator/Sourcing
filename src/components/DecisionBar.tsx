@@ -86,7 +86,7 @@ export function DecisionBar({ companyId, initialComment = "", onCommit, disabled
   }, [choose, disabled]);
 
   return (
-    <div className="relative z-20 border-t border-border bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
+    <div className="relative z-20 shrink-0 border-t border-border bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
       <label htmlFor="review-comment" className="mb-1.5 block text-xs text-muted-foreground">
         Comment
       </label>
