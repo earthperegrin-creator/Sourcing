@@ -139,18 +139,18 @@ export function CompanyCard({ company }: { company: Company }) {
           </div>
         ) : null}
       </CardHeader>
-      {firstRead ? (
-        <FirstRead
-          paragraph={firstRead}
-          evidence={Array.isArray(company.first_read_evidence) ? company.first_read_evidence : []}
-        />
-      ) : null}
       <Separator />
       <CardContent className="px-4 py-3">
         <p className="text-lg leading-7 break-words whitespace-normal text-foreground" data-what-it-is>
           {about}
         </p>
       </CardContent>
+      {firstRead ? (
+        <FirstRead
+          paragraph={firstRead}
+          evidence={Array.isArray(company.first_read_evidence) ? company.first_read_evidence : []}
+        />
+      ) : null}
       <BoardNumbers headcount={headcount} jobs={jobs} />
       {bullets.length > 0 ? (
         <>
