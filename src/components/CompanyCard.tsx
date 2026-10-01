@@ -57,7 +57,7 @@ function FirstRead({ paragraph, evidence }: { paragraph: string; evidence: strin
       <CardContent className="px-4 py-3">
         <section data-first-read className="rounded-lg border border-border bg-muted px-3 py-3">
           <h2 className="text-sm font-medium tracking-tight text-foreground">First Read</h2>
-          <p className="mt-2 text-sm leading-6 break-words whitespace-normal text-foreground" data-first-read-body>
+          <p className="mt-2 text-lg leading-7 break-words whitespace-normal text-foreground" data-first-read-body>
             {paragraph}
           </p>
           {evidence.length > 0 ? (
@@ -66,7 +66,7 @@ function FirstRead({ paragraph, evidence }: { paragraph: string; evidence: strin
                 <li
                   key={`${index}-${item}`}
                   data-first-read-evidence
-                  className="text-sm leading-5 break-words whitespace-normal text-foreground"
+                  className="text-lg leading-7 break-words whitespace-normal text-foreground"
                 >
                   {item}
                 </li>
@@ -147,7 +147,7 @@ export function CompanyCard({ company }: { company: Company }) {
       ) : null}
       <Separator />
       <CardContent className="px-4 py-3">
-        <p className="text-sm leading-6 break-words whitespace-normal text-foreground" data-what-it-is>
+        <p className="text-lg leading-7 break-words whitespace-normal text-foreground" data-what-it-is>
           {about}
         </p>
       </CardContent>
@@ -161,7 +161,7 @@ export function CompanyCard({ company }: { company: Company }) {
                 <li
                   key={`${bullet.label ?? "hook"}-${index}`}
                   data-bullet={bullet.label ?? "hook"}
-                  className="text-sm leading-5 break-words whitespace-normal text-foreground"
+                  className="text-lg leading-7 break-words whitespace-normal text-foreground"
                 >
                   {bullet.label ? <span className="text-muted-foreground">{bullet.label}. </span> : null}
                   {bullet.text}
