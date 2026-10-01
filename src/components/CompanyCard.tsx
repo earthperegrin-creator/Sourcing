@@ -50,6 +50,35 @@ function Fact({ label, value, hint }: { label: string; value: string; hint: stri
   );
 }
 
+function FirstRead({ paragraph, evidence }: { paragraph: string; evidence: string[] }) {
+  return (
+    <>
+      <Separator />
+      <CardContent className="px-4 py-3">
+        <section data-first-read className="rounded-lg border border-border bg-muted px-3 py-3">
+          <h2 className="text-sm font-medium tracking-tight text-foreground">First Read</h2>
+          <p className="mt-2 text-sm leading-6 break-words whitespace-normal text-foreground" data-first-read-body>
+            {paragraph}
+          </p>
+          {evidence.length > 0 ? (
+            <ul className="mt-3 list-disc space-y-1.5 border-t border-border pt-3 pl-4">
+              {evidence.map((item, index) => (
+                <li
+                  key={`${index}-${item}`}
+                  data-first-read-evidence
+                  className="text-sm leading-5 break-words whitespace-normal text-foreground"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      </CardContent>
+    </>
+  );
+}
+
 function BoardNumbers({ headcount, jobs }: { headcount: number | null; jobs: number | null }) {
   const tiles = [
     headcount != null ? { id: "headcount", label: "Headcount", value: String(headcount), hint: "people" } : null,
@@ -86,6 +115,7 @@ export function CompanyCard({ company }: { company: Company }) {
   const bullets = cardBullets(company, about);
   const headcount = countOrNull(company.headcount_104_num);
   const jobs = countOrNull(company.open_jobs_104_num);
+  const firstRead = company.first_read?.trim() ?? "";
 
   return (
     <Card aria-label={company.name} className="gap-0 rounded-xl py-0 shadow-sm">
@@ -109,6 +139,12 @@ export function CompanyCard({ company }: { company: Company }) {
           </div>
         ) : null}
       </CardHeader>
+      {firstRead ? (
+        <FirstRead
+          paragraph={firstRead}
+          evidence={Array.isArray(company.first_read_evidence) ? company.first_read_evidence : []}
+        />
+      ) : null}
       <Separator />
       <CardContent className="px-4 py-3">
         <p className="text-sm leading-6 break-words whitespace-normal text-foreground" data-what-it-is>
