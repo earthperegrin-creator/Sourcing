@@ -17,6 +17,24 @@ function asHooks(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
 }
 
+function asStringList(value: unknown): string[] {
+  let source = value;
+  if (typeof source === "string") {
+    const trimmed = source.trim();
+    if (!trimmed.startsWith("[")) return [];
+    try {
+      source = JSON.parse(trimmed) as unknown;
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(source)) return [];
+  return source
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
 export function toCompany(row: unknown): Company | null {
   if (!row || typeof row !== "object") return null;
   const record = row as Record<string, unknown>;
@@ -52,5 +70,7 @@ export function toCompany(row: unknown): Company | null {
     hiring_activity_104: asString(record.hiring_activity_104),
     what_it_is: asString(record.what_it_is),
     kind_plain: asString(record.kind_plain),
+    first_read: asString(record.first_read),
+    first_read_evidence: asStringList(record.first_read_evidence),
   };
 }

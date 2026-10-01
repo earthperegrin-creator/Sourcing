@@ -27,4 +27,6 @@ export interface Company {
   hiring_activity_104: string | null;
   what_it_is: string | null;
   kind_plain: string | null;
+  first_read: string | null;
+  first_read_evidence: string[];
 }
