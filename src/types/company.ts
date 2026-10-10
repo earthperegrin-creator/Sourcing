@@ -26,6 +26,7 @@ export interface Company {
   open_jobs_104_num: number | null;
   hiring_activity_104: string | null;
   what_it_is: string | null;
+  keywords: string | null;
   kind_plain: string | null;
   first_read: string | null;
   first_read_evidence: string[];
