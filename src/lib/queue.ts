@@ -83,7 +83,7 @@ export async function loadQueue(): Promise<QueueLoad> {
 
   try {
     const [companiesResult, reviewsResult] = await Promise.all([
-      supabase.from("companies").select("*").limit(1000),
+      supabase.from("companies").select("*,keywords").limit(1000),
       supabase.from("reviews").select("company_id,vote,dig,comment,updated_at").limit(1000),
     ]);
 

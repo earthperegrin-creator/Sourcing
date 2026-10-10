@@ -69,6 +69,7 @@ export function toCompany(row: unknown): Company | null {
     open_jobs_104_num: asNumber(record.open_jobs_104_num),
     hiring_activity_104: asString(record.hiring_activity_104),
     what_it_is: asString(record.what_it_is),
+    keywords: asString(record.keywords),
     kind_plain: asString(record.kind_plain),
     first_read: asString(record.first_read),
     first_read_evidence: asStringList(record.first_read_evidence),

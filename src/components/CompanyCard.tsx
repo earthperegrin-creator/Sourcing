@@ -79,6 +79,14 @@ function FirstRead({ paragraph, evidence }: { paragraph: string; evidence: strin
   );
 }
 
+function keywordTags(value: string | null | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
 function BoardNumbers({ headcount, jobs }: { headcount: number | null; jobs: number | null }) {
   const tiles = [
     headcount != null ? { id: "headcount", label: "Headcount", value: String(headcount), hint: "people" } : null,
@@ -116,6 +124,7 @@ export function CompanyCard({ company }: { company: Company }) {
   const headcount = countOrNull(company.headcount_104_num);
   const jobs = countOrNull(company.open_jobs_104_num);
   const firstRead = company.first_read?.trim() ?? "";
+  const keywords = keywordTags(company.keywords);
 
   return (
     <Card aria-label={company.name} className="gap-0 rounded-xl py-0 shadow-sm">
@@ -144,6 +153,20 @@ export function CompanyCard({ company }: { company: Company }) {
         <p className="text-lg leading-7 break-words whitespace-normal text-foreground" data-what-it-is>
           {about}
         </p>
+        {keywords.length > 0 ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {keywords.map((keyword, index) => (
+              <Badge
+                key={`${keyword}-${index}`}
+                variant="outline"
+                data-keyword={keyword}
+                className="h-auto max-w-full overflow-visible whitespace-normal text-left"
+              >
+                {keyword}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
       </CardContent>
       {firstRead ? (
         <FirstRead
