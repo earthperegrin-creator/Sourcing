@@ -1,5 +1,6 @@
 import { Globe, Landmark, Linkedin } from "lucide-react";
 import { cardAbout, cardBullets, countOrNull } from "../lib/cardBrief";
+import { educateMeHint } from "../lib/educateMe";
 import { kindLabel } from "../lib/plainCompany";
 import { sourceLinksFor, type SourceKind } from "../lib/sourceLinks";
 import type { Company } from "../types/company";
@@ -120,6 +121,7 @@ export function CompanyCard({ company }: { company: Company }) {
   const kind = company.kind_plain?.trim() || kindLabel(company);
   const stage = company.stage?.trim() ?? "";
   const about = cardAbout(company);
+  const educateHint = educateMeHint(company.what_it_is);
   const bullets = cardBullets(company, about);
   const headcount = countOrNull(company.headcount_104_num);
   const jobs = countOrNull(company.open_jobs_104_num);
@@ -150,9 +152,19 @@ export function CompanyCard({ company }: { company: Company }) {
       </CardHeader>
       <Separator />
       <CardContent className="px-4 py-3">
-        <p className="text-lg leading-7 break-words whitespace-normal text-foreground" data-what-it-is>
-          {about}
-        </p>
+        <section data-educate-me>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <h2 className="text-sm font-medium tracking-tight text-foreground">Educate me</h2>
+            {educateHint ? (
+              <p className="text-xs text-muted-foreground" data-educate-hint>
+                {educateHint}
+              </p>
+            ) : null}
+          </div>
+          <p className="mt-2 text-lg leading-7 break-words whitespace-normal text-foreground" data-what-it-is>
+            {about}
+          </p>
+        </section>
         {keywords.length > 0 ? (
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {keywords.map((keyword, index) => (
